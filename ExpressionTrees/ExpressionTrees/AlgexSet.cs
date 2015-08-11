@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ExpressionTrees
 {
-    public class AlgexSet:IDictionary<string, string>, INotifyPropertyChanged, INotifyCollectionChanged
+    public class AlgexSet
     {
         private Dictionary<string, Algex> _dict;
 
@@ -22,6 +22,18 @@ namespace ExpressionTrees
             _dict = new Dictionary<string, Algex>();
         }
 
+        public void SolveAll()
+        {
+            var allVars = GetAllNeededVariableNames().ToList();
+            if (allVars.Count(x => _dict.ContainsKey(x)) != allVars.Count) throw new Exception("There are undefined variables");
+            if (!TrySolveAll()) throw new Exception("Recursion Detected");
+        }
+
+        public IEnumerable<string> GetAllNeededVariableNames()
+        {
+            return _dict.Aggregate((IEnumerable<string>)(new List<string>()), (current, x) => x.Value.DependantOn.Union(current));
+        }
+
         public bool TrySolveAll()
         {
             bool anySolved = true;
@@ -34,11 +46,9 @@ namespace ExpressionTrees
             return _dict.Count == _dict.Count(x => x.Value.IsSolved);
         }
 
-        public void SolveAll()
+        public void Add(string key, double value)
         {
-            var allVars = _dict.Aggregate((IEnumerable<string>)(new List<string>()), (current, x) => x.Value.DependantOn.Union(current)).ToList();
-            if (allVars.Intersect(_dict.Keys).Count() != allVars.Count) throw new Exception("There are undefined variables");
-            if (!TrySolveAll()) throw new Exception("Recursion Detected");
+            Add(key, value.ToString());
         }
 
         public void Add(string key, string expression)
@@ -51,7 +61,6 @@ namespace ExpressionTrees
         private void Add(string key, Algex value)
         {
             _dict.Add(key, value);
-            //CollectionChanged.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add));
         }
 
         public bool ContainsKey(string key)
@@ -73,7 +82,6 @@ namespace ExpressionTrees
                 {
                     _dict[variable].Reset();
                 }
-                //CollectionChanged.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove));
                 return true;
             }
             return false;
@@ -84,7 +92,7 @@ namespace ExpressionTrees
             throw new NotImplementedException();
         }
 
-        public ICollection<string> Values
+        public ICollection<string> Expressions
         {
             get
             {
@@ -92,25 +100,25 @@ namespace ExpressionTrees
             }
         }
 
-        public string this[string key]
+        public void ChangeExpression(string key, string value)
+        {
+            _dict[key].InnerExpression = value;
+            foreach (var var in GetAllDependingOn(key))
+            {
+                _dict[var].Reset();
+            }
+            if (ImmediateSolve) TrySolveAll();
+        }
+
+        public double this[string key]
         {
             get
             {
-                return _dict[key].InnerExpression;
-            }
-            set
-            {
-                _dict[key].InnerExpression = value;
-                foreach (var var in GetAllDependingOn(key))
-                {
-                    _dict[var].Reset();
-                }
-                if (ImmediateSolve) TrySolveAll();
-                //CollectionChanged.Invoke(_dict[key], new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace));
+                return _dict[key].Value;
             }
         }
 
-        private List<string> GetAllDependingOn(string key)
+        private IEnumerable<string> GetAllDependingOn(string key)
         {
             var result = new List<string>{key};
             var extendedResult = new List<string>{key};
@@ -137,9 +145,19 @@ namespace ExpressionTrees
             return result;
          }
 
-        public List<string> GetSolvedKeys()
+        public Dictionary<string, double> GetAllValues()
         {
-            return _dict.Where(x => x.Value.IsSolved).Select(x => x.Key).ToList();
+            var result = new Dictionary<string, double>();
+            foreach (var key in _dict.Keys)
+            {
+                result.Add(key, _dict[key].Value);
+            }
+            return result;
+        }
+
+        public IEnumerable<string> GetSolvedKeys()
+        {
+            return _dict.Where(x => x.Value.IsSolved).Select(x => x.Key);
         }
 
         public void RenameVariable(string oldName, string newName)
@@ -160,11 +178,6 @@ namespace ExpressionTrees
             Add(newName, item.InnerExpression);
         }
 
-        public double Value(string key)
-        {
-            return _dict[key].Value;
-        }
-
         public void Add(KeyValuePair<string, string> item)
         {
             this.Add(item.Key, item.Value);
@@ -173,17 +186,11 @@ namespace ExpressionTrees
         public void Clear()
         {
             _dict.Clear();
-            //CollectionChanged.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         public bool Contains(KeyValuePair<string, string> item)
         {
-            return _dict[item.Key].InnerExpression == item.Value;
-        }
-
-        public void CopyTo(KeyValuePair<string, string>[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
+            return _dict.ContainsKey(item.Key) && _dict[item.Key].InnerExpression == item.Value;
         }
 
         public int Count
@@ -191,30 +198,15 @@ namespace ExpressionTrees
             get { return _dict.Count; }
         }
 
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-
         public bool Remove(KeyValuePair<string, string> item)
         {
             if (!Contains(item)) return false;
             return Remove(item.Key);
-            
         }
 
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+        public IEnumerator<KeyValuePair<string, double>> GetEnumerator()
         {
-            throw new NotImplementedException();
+            return _dict.Select(x => new KeyValuePair<string, double>(x.Key, x.Value.Value)).GetEnumerator();
         }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
     }
 }

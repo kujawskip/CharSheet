@@ -9,11 +9,17 @@ using System.ComponentModel;
 namespace ExpressionTrees
 {
 
-    public class Algex : INotifyPropertyChanged
+    public class Algex
     {
         public static string[] Operators = {"(", ")", "+", "-", "*", "/"};
 
+        /// <summary>
+        /// Input string representing algorithmic expression.
+        /// </summary>
         string _expression;
+        /// <summary>
+        /// Input string representing algorithmic expression.
+        /// </summary>
         public string InnerExpression
         {
             get {return _expression;}
@@ -22,54 +28,76 @@ namespace ExpressionTrees
                 if (!IsProperArithmeticExpression(value)) throw new ArgumentException();
                 _expression = value;
                 FindAllNeededVariables();
-                toONP(InnerExpression);
+                toRPN(InnerExpression);
                 IsSolved = false;
-                //PropertyChanged.Invoke(this, new PropertyChangedEventArgs("InnerExpression"));
             }
         }
-        List<string> ONP;
+        /// <summary>
+        /// Reverse polish notation of inner expression.
+        /// </summary>
+        List<string> RPN;
 
+        /// <summary>
+        /// Variable context.
+        /// </summary>
         Dictionary<string, double> _varCtx;
+        /// <summary>
+        /// Variable context.
+        /// </summary>
         public Dictionary<string, double> VariableContext
         {
             get { return _varCtx; }
             set
             {
                 _varCtx = value;
-                //PropertyChanged.Invoke(this, new PropertyChangedEventArgs("VariableContext"));
             }
         }
 
+        /// <summary>
+        /// List of variable names this Algex instance is dependant on.
+        /// </summary>
         List<string> _dependantOn;
+        /// <summary>
+        /// List of variable names this Algex instance is dependant on.
+        /// </summary>
         public List<string> DependantOn
         {
             get { return _dependantOn; }
             private set
             {
                 _dependantOn = value;
-                //PropertyChanged.Invoke(this, new PropertyChangedEventArgs("DependantOn"));
             }
         }
 
+        /// <summary>
+        /// Indicates wheather this Algex has been solved.
+        /// </summary>
         bool _isSolved = false;
+        /// <summary>
+        /// Indicates wheather this Algex has been solved.
+        /// </summary>
         public bool IsSolved
         {
             get { return _isSolved; }
             private set
             {
                 _isSolved = value;
-                //PropertyChanged.Invoke(this, new PropertyChangedEventArgs("IsSolved"));
             }
         }
 
+        /// <summary>
+        /// Calculated value of inner expression.
+        /// </summary>
         double _value = double.NaN;
+        /// <summary>
+        /// Calculated value of inner expression.
+        /// </summary>
         public double Value
         {
             get { return _value; }
             private set
             {
                 _value = value;
-                //PropertyChanged.Invoke(this, new PropertyChangedEventArgs("Value"));
             }
         }
 
@@ -80,6 +108,9 @@ namespace ExpressionTrees
             if (immediateSolve || DependantOn.Count == 0) Solve();
         }
 
+        /// <summary>
+        /// Constructs DependantOn list
+        /// </summary>
         private void FindAllNeededVariables()
         {
             var depOn = new List<string>();
@@ -96,6 +127,9 @@ namespace ExpressionTrees
             DependantOn = depOn;
         }
 
+        /// <summary>
+        /// Checks if there are variables that are not in the variable context.
+        /// </summary>
         public bool UnknownVariablePresent
         {
             get
@@ -108,6 +142,10 @@ namespace ExpressionTrees
             }
         }
 
+        /// <summary>
+        /// Checks if input expression is properly formed algorithmic expression.
+        /// </summary>
+        /// <param name="expression">Input expression.</param>
         public static bool IsProperArithmeticExpression(string expression)
         {
             //TODO: Add culture specific decimal separator and enable decimal thingies to be accepted
@@ -158,7 +196,11 @@ namespace ExpressionTrees
             return true;
         }
 
-        private void toONP(string expression)
+        /// <summary>
+        /// Generates reverse polish notation of input expression.
+        /// </summary>
+        /// <param name="expression">Input expression.</param>
+        private void toRPN(string expression)
         {
             var f = expression.Replace(" ", "");
             f = f.Replace("-(", "-1*(");
@@ -239,26 +281,35 @@ namespace ExpressionTrees
                 }
             }
             output.AddRange(stack);
-            ONP = output;
+            RPN = output;
         }
 
+        /// <summary>
+        /// Solves inner expression based on inner variable context.
+        /// </summary>
+        /// <returns>True if succeded, false otherwise.</returns>
         public bool Solve()
         {
             return Solve(this.VariableContext);
         }
 
+        /// <summary>
+        /// Solves inner expression based on input variable context.
+        /// </summary>
+        /// <param name="variableCtx">Input variable context.</param>
+        /// <returns>True if succeded, false otherwise.</returns>
         public bool Solve(IDictionary<string, double> variableCtx)
         {
             if (UnknownVariablePresent) return false;
             var s = new Stack<double>();
-            for (int i = 0; i < ONP.Count; i++)
+            for (int i = 0; i < RPN.Count; i++)
             {
-                if (Operators.Contains(ONP[i]))
+                if (Operators.Contains(RPN[i]))
                 {
                     var right = s.Pop();
                     var left = s.Pop();
                     double result;
-                    switch (ONP[i])
+                    switch (RPN[i])
                     {
                         case "+": result = left + right; break;
                         case "-": result = left - right; break;
@@ -270,13 +321,13 @@ namespace ExpressionTrees
                 }
                 else
                 {
-                    if (ONP[i].EndsWith("}") && ONP[i].StartsWith("{"))
+                    if (RPN[i].EndsWith("}") && RPN[i].StartsWith("{"))
                     {
-                        var var = ONP[i].Substring(1, ONP[i].Length - 2);
+                        var var = RPN[i].Substring(1, RPN[i].Length - 2);
                         s.Push(variableCtx[var]);
                     }
                     else
-                    s.Push(double.Parse(ONP[i]));
+                    s.Push(double.Parse(RPN[i]));
                 }
             }
             if (s.Count != 1) throw new ArgumentException();
@@ -290,12 +341,13 @@ namespace ExpressionTrees
             return InnerExpression+" = "+Value;
         }
 
+        /// <summary>
+        /// Resets expression to unsolved state;
+        /// </summary>
         public void Reset()
         {
             IsSolved = false;
             Value = double.NaN;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
