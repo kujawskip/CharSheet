@@ -27,9 +27,9 @@ namespace ExpressionTrees
             {
                 if (!IsProperArithmeticExpression(value)) throw new ArgumentException();
                 _expression = value;
+                Reset();
                 FindAllNeededVariables();
                 toRPN(InnerExpression);
-                IsSolved = false;
             }
         }
         /// <summary>
