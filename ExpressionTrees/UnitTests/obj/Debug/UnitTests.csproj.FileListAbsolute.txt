@@ -1,7 +1,0 @@
-C:\Users\Patryk\CharSheet\ExpressionTrees\UnitTests\bin\Debug\UnitTests.dll
-C:\Users\Patryk\CharSheet\ExpressionTrees\UnitTests\bin\Debug\UnitTests.pdb
-C:\Users\Patryk\CharSheet\ExpressionTrees\UnitTests\bin\Debug\ExpressionTrees.dll
-C:\Users\Patryk\CharSheet\ExpressionTrees\UnitTests\bin\Debug\ExpressionTrees.pdb
-C:\Users\Patryk\CharSheet\ExpressionTrees\UnitTests\obj\Debug\UnitTests.csprojResolveAssemblyReference.cache
-C:\Users\Patryk\CharSheet\ExpressionTrees\UnitTests\obj\Debug\UnitTests.dll
-C:\Users\Patryk\CharSheet\ExpressionTrees\UnitTests\obj\Debug\UnitTests.pdb

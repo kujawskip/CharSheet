@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using ExpressionTrees;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ExpressionTrees;
+using System.Collections.Generic;
 
 namespace UnitTests
 {
@@ -11,7 +11,7 @@ namespace UnitTests
         [TestMethod]
         public void ExpressionBasicTests()
         {
-            var tests = new[] 
+            var tests = new Tuple<string, double>[] 
             {
                 new Tuple<string, double>("3", 3),
                 new Tuple<string, double>("2+2", 4),
@@ -32,7 +32,7 @@ namespace UnitTests
         [TestMethod]
         public void ExpressionAdvancedTests()
         {
-            var tests = new[] 
+            var tests = new Tuple<string, double>[] 
             {
                 new Tuple<string, double>("2+-2", 0),
                 new Tuple<string, double>("-1*2", -2),
@@ -50,8 +50,12 @@ namespace UnitTests
         [TestMethod]
         public void ExpressionVariableContextTests()
         {
-            var var = new Dictionary<string, double> {{"a", 2}, {"b", -1}, {"cd", 2}, {"zero", 0}};
-            var tests = new[] 
+            var var = new Dictionary<string, double>();
+            var.Add("a", 2);
+            var.Add("b", -1);
+            var.Add("cd", 2);
+            var.Add("zero", 0);
+            var tests = new Tuple<string, double>[] 
             {
                 new Tuple<string, double>("{a}+-2", 0),
                 new Tuple<string, double>("{b}*2", -2),
@@ -69,8 +73,12 @@ namespace UnitTests
         [TestMethod]
         public void ExpressionVariableContextNestedTests()
         {
-            var var = new Dictionary<string, double> {{"a", 2}, {"b", -1}, {"cd", 5}, {"zero", 0}};
-            var tests = new[] 
+            var var = new Dictionary<string, double>();
+            var.Add("a", 2);
+            var.Add("b", -1);
+            var.Add("cd", 5);
+            var.Add("zero", 0);
+            var tests = new Tuple<string, double>[] 
             {
                 new Tuple<string, double>("(2+3*(5-(7+12))*{zero})", 2),
                 new Tuple<string, double>("(3-3)/(((3+3)*5)*{b})*(-1*{b})", 0),
@@ -85,7 +93,7 @@ namespace UnitTests
         [TestMethod]
         public void ExpressionSetTest()
         {
-            var tests = new[] 
+            var tests = new Tuple<string, string, double>[] 
             {
                 new Tuple<string, string, double>("a", "2", 2),
                 new Tuple<string, string, double>("b", "{a}-1", 1),
@@ -102,17 +110,16 @@ namespace UnitTests
                 set.Add(test.Item1, test.Item2);
             }
             set.SolveAll();
-            var results = set.GetValues();
             foreach (var test in tests)
             {
-                Assert.AreEqual(results[test.Item1], test.Item3);
+                Assert.AreEqual(set[test.Item1], test.Item3);
             }
         }
 
         [TestMethod]
         public void ExpressionSetTestImmediateSolve()
         {
-            var tests = new[] 
+            var tests = new Tuple<string, string, double>[] 
             {
                 new Tuple<string, string, double>("a", "2", 2),
                 new Tuple<string, string, double>("b", "{a}-1", 1),
@@ -123,15 +130,15 @@ namespace UnitTests
                 new Tuple<string, string, double>("g","{f}/{c}+1", 4),
                 new Tuple<string, string, double>("all","({f}/{c}-{g}+{b})*({a}+{f})+{d}*{e}", 30)
             };
-            var set = new AlgexSet {ImmediateSolve = true};
+            var set = new AlgexSet();
+            set.ImmediateSolve = true;
             foreach (var test in tests)
             {
                 set.Add(test.Item1, test.Item2);
             }
-            var results = set.GetValues();
             foreach (var test in tests)
             {
-                Assert.AreEqual(results[test.Item1], test.Item3);
+                Assert.AreEqual(set[test.Item1], test.Item3);
             }
         }
         [TestMethod]
@@ -149,15 +156,15 @@ namespace UnitTests
                 new Tuple<string, string, double>("all","({f}/{c}-{g}+{b})*({a}+{f})+{d}*{e}", 30)
             };
             tests.Reverse();
-            var set = new AlgexSet {ImmediateSolve = true};
+            var set = new AlgexSet();
+            set.ImmediateSolve = true;
             foreach (var test in tests)
             {
                 set.Add(test.Item1, test.Item2);
             }
-            var results = set.GetValues();
             foreach (var test in tests)
             {
-                Assert.AreEqual(results[test.Item1], test.Item3);
+                Assert.AreEqual(set[test.Item1], test.Item3);
             }
         }
         [TestMethod]
@@ -174,15 +181,15 @@ namespace UnitTests
                 new Tuple<string, string, double>("f","{e}+4*{b}", 9),
                 new Tuple<string, string, double>("d","{a}*{c}", 6)
             };
-            var set = new AlgexSet {ImmediateSolve = true};
+            var set = new AlgexSet();
+            set.ImmediateSolve = true;
             foreach (var test in tests)
             {
                 set.Add(test.Item1, test.Item2);
             }
-            var results = set.GetValues();
             foreach (var test in tests)
             {
-                Assert.AreEqual(results[test.Item1], test.Item3);
+                Assert.AreEqual(set[test.Item1], test.Item3);
             }
         }
 
@@ -200,17 +207,17 @@ namespace UnitTests
                 new Tuple<string, string, double>("g","{f}/{c}+1", 4),
                 new Tuple<string, string, double>("all","({f}/{c}-{g}+{b})*({a}+{f})+{d}*{e}", 30)
             };
-            var set = new AlgexSet {ImmediateSolve = true};
+            var set = new AlgexSet();
+            set.ImmediateSolve = true;
             foreach (var test in tests)
             {
                 set.Add(test.Item1, test.Item2);
             }
             set.RenameVariable("c", "cc");
             tests[2] = new Tuple<string, string, double>("cc", "{a}+{b}", 3);
-            var results = set.GetValues();
             foreach (var test in tests)
             {
-                Assert.AreEqual(results[test.Item1], test.Item3);
+                Assert.AreEqual(set[test.Item1], test.Item3);
             }
         }
 
@@ -228,26 +235,49 @@ namespace UnitTests
                 new Tuple<string, string, double>("g","{f}/{c}+1", 4),
                 new Tuple<string, string, double>("all","({f}/{c}-{g}+{b})*({a}+{f})+{d}*{e}", 30)
             };
-            var set = new AlgexSet {ImmediateSolve = true};
+            var set = new AlgexSet();
+            set.ImmediateSolve = true;
             foreach (var test in tests)
             {
                 set.Add(test.Item1, test.Item2);
             }
             set.Remove("a");
             tests.RemoveAt(0);
-            var results = set.GetValues();
             foreach (var test in tests)
             {
-                Assert.AreEqual(false, results.ContainsKey(test.Item1));
+                Assert.AreEqual(true, double.IsNaN(set[test.Item1]));
             }
-        
-            set.Add("a", "2");
-            results = set.GetValues();
+            set.Add("a", 2);
             foreach (var test in tests)
             {
-                Assert.AreEqual(results[test.Item1], test.Item3);
+                Assert.AreEqual(test.Item3, set[test.Item1]);
             }
         }
-
+        [TestMethod]
+        public void ExpressionSetTestChangeExpression()
+        {
+            var tests = new List<Tuple<string, string, double>>
+            {
+                new Tuple<string, string, double>("a", "2", 2),
+                new Tuple<string, string, double>("b", "{a}-1", 1),
+                new Tuple<string, string, double>("c","{a}+{b}", 3),
+                new Tuple<string, string, double>("d","{a}*{c}", 6),
+                new Tuple<string, string, double>("e","{d}-{b}", 5),
+                new Tuple<string, string, double>("f","{e}+4*{b}", 9),
+                new Tuple<string, string, double>("g","{f}/{c}+1", 4),
+                new Tuple<string, string, double>("all","({f}/{c}-{g}+{b})*({a}+{f})+{d}*{e}", 30)
+            };
+            var set = new AlgexSet();
+            set.ImmediateSolve = true;
+            foreach (var test in tests)
+            {
+                set.Add(test.Item1, test.Item2);
+            }
+            set.ChangeExpression("e", "2*{a}+{b}");
+            foreach (var test in tests)
+            {
+                Assert.AreEqual(test.Item3, set[test.Item1]);
+            }
+        }
     }
 }
