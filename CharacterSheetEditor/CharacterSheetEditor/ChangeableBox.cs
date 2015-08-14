@@ -120,12 +120,14 @@ namespace CharacterSheetEditor
             isSizeChangeable = false;
             Unfocus();
         }
-        protected override void OnMouseDown(MouseButtonEventArgs e)
+
+        protected void HandleMouse(MouseButtonEventArgs e, bool Check)
         {
             if (e.Handled)
             {
                 e.Handled = false;
                 base.OnMouseDown(e);
+                return;
             }
             if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
             {
@@ -142,6 +144,14 @@ namespace CharacterSheetEditor
                 e.Handled = true;
                 isSelected = true;
             }
+            else if (!Check)
+            {
+                base.OnMouseDown(e);
+            }
+        }
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+           HandleMouse(e,false);
            
         }
 

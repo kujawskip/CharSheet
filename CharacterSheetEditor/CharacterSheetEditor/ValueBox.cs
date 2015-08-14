@@ -43,9 +43,12 @@ namespace CharacterSheetEditor
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            base.OnMouseDown(e);
+           
+            HandleMouse(e,true);
             if (e.Handled)
             {
+                
+               
                 return;
             }
             if (Keyboard.IsKeyDown(Key.LeftCtrl))
@@ -57,7 +60,7 @@ namespace CharacterSheetEditor
                 isEdited = true;
                 e.Handled = true;
                 Text = Formula;
-                base.OnMouseDown(e);
+                HandleMouse(e, true);
             }
 
         }

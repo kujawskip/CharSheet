@@ -29,6 +29,7 @@ namespace CharacterSheetEditor
             InitializeComponent();
             controlCreators= new Dictionary<string, ControlCreator>();
             controlCreators.Add("ValueBox",CreateValueBox);
+            controlCreators.Add("TextBox", CreateTextBox);
             sheet  = new CharacterSheet();
         }
 
@@ -38,12 +39,17 @@ namespace CharacterSheetEditor
            
 
         }
-        
+        private void CreateTextBox(Point L, Canvas P)
+        {
+            ChangeableBox T = new ChangeableBox(sheet, P, L);
+
+
+        }
         private void UIElement_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (e.Handled) return;
             Point P = e.GetPosition(MainCanvas);
-            foreach (ValueBox vb in MainCanvas.Children)
+            foreach (ChangeableBox vb in MainCanvas.Children)
                 {
                     if (vb.isToMove)
                     {
@@ -53,7 +59,7 @@ namespace CharacterSheetEditor
                         
                     }
                 }
-            foreach (ValueBox vb in MainCanvas.Children)
+            foreach (ChangeableBox vb in MainCanvas.Children)
             {
                 if (vb.isSelected)
                 {
@@ -63,7 +69,7 @@ namespace CharacterSheetEditor
                 }
             }
             if (Keyboard.IsKeyDown(Key.LeftCtrl)) return;
-           foreach (ValueBox Child in MainCanvas.Children)
+            foreach (ChangeableBox Child in MainCanvas.Children)
             {
                Child.Unfocus();
             }
@@ -88,14 +94,14 @@ namespace CharacterSheetEditor
         {
             Point P = e.GetPosition(MainCanvas);
 
-            foreach (ValueBox vb in MainCanvas.Children)
+            foreach (ChangeableBox vb in MainCanvas.Children)
             {
                 if (vb.isSelected)
                 {
                     vb.SetSize((int)Math.Abs(P.Y - vb.Y), (int)Math.Abs(P.X - vb.X));
                 }
             }
-            foreach (ValueBox vb in MainCanvas.Children)
+            foreach (ChangeableBox vb in MainCanvas.Children)
                 {
                     if (vb.isToMove)
                     {
