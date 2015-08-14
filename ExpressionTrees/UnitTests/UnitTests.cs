@@ -51,13 +51,13 @@ namespace UnitTests
         public void ExpressionVariableContextTests()
         {
             var var = new Dictionary<string, double>();
-            var.Add("a", 2);
+            var.Add("a1", 2);
             var.Add("b", -1);
             var.Add("cd", 2);
             var.Add("zero", 0);
             var tests = new Tuple<string, double>[] 
             {
-                new Tuple<string, double>("{a}+-2", 0),
+                new Tuple<string, double>("{a1}+-2", 0),
                 new Tuple<string, double>("{b}*2", -2),
                 new Tuple<string, double>("-1*-2", 2),
                 new Tuple<string, double>("-3*({cd}+2)", -12),
@@ -112,7 +112,7 @@ namespace UnitTests
             set.SolveAll();
             foreach (var test in tests)
             {
-                Assert.AreEqual(set[test.Item1], test.Item3);
+                Assert.AreEqual(test.Item3, set[test.Item1]);
             }
         }
 
@@ -138,7 +138,7 @@ namespace UnitTests
             }
             foreach (var test in tests)
             {
-                Assert.AreEqual(set[test.Item1], test.Item3);
+                Assert.AreEqual(test.Item3, set[test.Item1]);
             }
         }
         [TestMethod]
@@ -164,7 +164,7 @@ namespace UnitTests
             }
             foreach (var test in tests)
             {
-                Assert.AreEqual(set[test.Item1], test.Item3);
+                Assert.AreEqual(test.Item3, set[test.Item1]);
             }
         }
         [TestMethod]
@@ -189,7 +189,7 @@ namespace UnitTests
             }
             foreach (var test in tests)
             {
-                Assert.AreEqual(set[test.Item1], test.Item3);
+                Assert.AreEqual(test.Item3, set[test.Item1]);
             }
         }
 
@@ -217,7 +217,7 @@ namespace UnitTests
             tests[2] = new Tuple<string, string, double>("cc", "{a}+{b}", 3);
             foreach (var test in tests)
             {
-                Assert.AreEqual(set[test.Item1], test.Item3);
+                Assert.AreEqual(test.Item3, set[test.Item1]);
             }
         }
 

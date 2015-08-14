@@ -114,7 +114,7 @@ namespace ExpressionTrees
         private void FindAllNeededVariables()
         {
             var depOn = new List<string>();
-            var rgx = new Regex(@"{\w*}");
+            var rgx = new Regex(@"{\w+\d*}");
             var matches = rgx.Matches(InnerExpression);
             foreach(Match match in matches)
             {
@@ -149,7 +149,7 @@ namespace ExpressionTrees
         public static bool IsProperArithmeticExpression(string expression)
         {
             //TODO: Add culture specific decimal separator and enable decimal thingies to be accepted
-            var rgx = new Regex(@"^-?((({\w+})|0|([1-9]\d*)))([+\-*/](-?(({\w+})|0|([1-9]\d*))))*$", RegexOptions.IgnorePatternWhitespace);
+            var rgx = new Regex(@"^-?((({\w+\d*})|0|([1-9]\d*)))([+\-*/](-?(({\w+\d*})|0|([1-9]\d*))))*$", RegexOptions.IgnorePatternWhitespace);
             var q = new Queue<string>();
             q.Enqueue(expression);
             while(q.Count!=0)
