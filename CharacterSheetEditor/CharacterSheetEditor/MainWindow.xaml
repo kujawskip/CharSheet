@@ -1,0 +1,24 @@
+﻿<Window x:Class="CharacterSheetEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525"  MouseLeftButtonUp="UIElement_OnMouseLeftButtonUp">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"> </ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Canvas Grid.Column="0" Background="White" MouseMove="MainCanvas_OnMouseMove"  MouseLeftButtonUp="UIElement_OnMouseLeftButtonUp" Name="MainCanvas"></Canvas>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10*"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <ListBox Grid.Row="0" Name="SelectableElements">
+                <ListBoxItem>ValueBox</ListBoxItem>
+                <ListBoxItem>ConditionBox</ListBoxItem>
+            </ListBox>
+            <Button Grid.Row="1"> PREVIEW</Button>
+        </Grid>
+       
+    </Grid>
+</Window>
