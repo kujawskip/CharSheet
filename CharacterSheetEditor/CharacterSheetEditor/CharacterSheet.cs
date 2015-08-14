@@ -12,6 +12,7 @@ namespace CharacterSheetEditor
     {
         public AlgexSet Formulas;
         public List<IFormulable> Boxes;
+        public List<IPlaceable> Blocks; 
         bool PreviewMode { get; set; }
 
         public void Update()
@@ -38,9 +39,10 @@ namespace CharacterSheetEditor
 
         public CharacterSheet()
         {
-            Formulas = new AlgexSet();
+            Formulas = new AlgexSet(){ImmediateSolve = true};
             Boxes = new List<IFormulable>();
             PreviewMode = true;
+            Blocks = new List<IPlaceable>();
         }
 
         internal bool IsFreeID(string newID)
